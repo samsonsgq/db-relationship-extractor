@@ -4,18 +4,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>db-relationship-extractor</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>db-relationship-extractor</name>
+    <artifactId>db2-relationship-detail-extractor</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>db2-relationship-detail-extractor</name>
+    <description>DB2 SQL static-analysis skeleton for relationship_detail.tsv generation.</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.jupiter.version>5.11.4</junit.jupiter.version>
+        <junit.jupiter.version>5.10.2</junit.jupiter.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>4.9</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -28,8 +35,13 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
                 </configuration>
