@@ -17,8 +17,8 @@ public final class LineAnchorResolver {
             return Optional.empty();
         }
 
-        for (int i = 0; i < sourceFile.lines().size(); i++) {
-            if (sourceFile.lines().get(i).contains(statementText.trim())) {
+        for (int i = 0; i < sourceFile.rawLines().size(); i++) {
+            if (sourceFile.rawLines().get(i).contains(statementText.trim())) {
                 int lineNo = i + 1;
                 return Optional.of(new StatementRegion(lineNo, lineNo, sourceFile.lineAt(lineNo)));
             }

@@ -10,28 +10,38 @@ import java.util.Objects;
 /**
  * Raw SQL source text holder used for exact line anchoring.
  */
-public record SqlSourceFile(Path path, String content, List<String> lines) {
+public record SqlSourceFile(Path absolutePath, Path relativePath, String content, List<String> rawLines) {
 
     public SqlSourceFile {
-        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(absolutePath, "absolutePath");
+        Objects.requireNonNull(relativePath, "relativePath");
         Objects.requireNonNull(content, "content");
-        Objects.requireNonNull(lines, "lines");
+        Objects.requireNonNull(rawLines, "rawLines");
     }
 
     public static SqlSourceFile fromPath(Path path) {
+        Path absolutePath = path.toAbsolutePath().normalize();
+        Path baseDirectory = absolutePath.getParent() == null ? absolutePath : absolutePath.getParent();
+        return fromPath(absolutePath, baseDirectory);
+    }
+
+    public static SqlSourceFile fromPath(Path path, Path baseDirectory) {
         try {
-            String content = Files.readString(path);
-            List<String> lines = Files.readAllLines(path);
-            return new SqlSourceFile(path, content, lines);
+            Path absolutePath = path.toAbsolutePath().normalize();
+            Path normalizedBaseDirectory = baseDirectory.toAbsolutePath().normalize();
+            Path relativePath = normalizedBaseDirectory.relativize(absolutePath);
+            String content = Files.readString(absolutePath);
+            List<String> rawLines = Files.readAllLines(absolutePath);
+            return new SqlSourceFile(absolutePath, relativePath, content, rawLines);
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to read SQL source file: " + path, e);
         }
     }
 
     public String lineAt(int oneBasedLineNo) {
-        if (oneBasedLineNo < 1 || oneBasedLineNo > lines.size()) {
+        if (oneBasedLineNo < 1 || oneBasedLineNo > rawLines.size()) {
             return "";
         }
-        return lines.get(oneBasedLineNo - 1);
+        return rawLines.get(oneBasedLineNo - 1);
     }
 }
