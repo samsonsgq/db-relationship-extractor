@@ -3,11 +3,20 @@ package com.example.db2lineage.source;
 import java.util.Objects;
 
 /**
- * Tracks a statement's coarse source region for downstream line anchoring.
+ * Tracks a statement's coarse source region for downstream parsing and line anchoring.
  */
-public record StatementRegion(int startLine, int endLine, String statementText) {
+public record StatementRegion(
+        String sourceObjectName,
+        String sourceObjectType,
+        int startLine,
+        int endLine,
+        String statementText,
+        String statementType
+) {
 
     public StatementRegion {
+        Objects.requireNonNull(sourceObjectName, "sourceObjectName");
+        Objects.requireNonNull(sourceObjectType, "sourceObjectType");
         if (startLine < 1 || endLine < startLine) {
             throw new IllegalArgumentException("Invalid statement region");
         }
