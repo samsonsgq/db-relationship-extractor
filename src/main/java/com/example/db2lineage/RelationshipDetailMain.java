@@ -1,17 +1,14 @@
 package com.example.db2lineage;
 
-import com.example.db2lineage.extract.RelationshipExtractor;
-import com.example.db2lineage.io.RelationshipDetailTsvWriter;
-import com.example.db2lineage.metadata.ObjectMetadataRegistry;
-import com.example.db2lineage.model.RelationshipDetailRow;
 import com.example.db2lineage.source.SqlSourceFile;
-import com.example.db2lineage.validate.RelationshipDetailValidator;
+import com.example.db2lineage.source.SqlSourceFileScanner;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Starter entry point for DB2 relationship_detail.tsv extraction.
+ * Phase 1 entry point: scan SQL files and load raw source content into memory.
  */
 public final class RelationshipDetailMain {
 
@@ -19,19 +16,25 @@ public final class RelationshipDetailMain {
     }
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Usage: RelationshipDetailMain <input-sql-file> <output-tsv-file>");
+        if (args.length < 1) {
+            System.err.println("Usage: RelationshipDetailMain <input-sql-dir> [<input-sql-dir> ...]");
             return;
         }
 
-        SqlSourceFile sourceFile = SqlSourceFile.fromPath(Path.of(args[0]));
-        ObjectMetadataRegistry metadataRegistry = ObjectMetadataRegistry.empty();
-        RelationshipExtractor extractor = RelationshipExtractor.defaultExtractor(metadataRegistry);
+        List<Path> inputDirectories = Arrays.stream(args)
+                .map(Path::of)
+                .toList();
 
-        List<RelationshipDetailRow> rows = extractor.extract(sourceFile);
-        RelationshipDetailValidator.validate(rows);
-        RelationshipDetailTsvWriter.write(Path.of(args[1]), rows);
+        SqlSourceFileScanner scanner = new SqlSourceFileScanner();
+        List<Path> discoveredFiles = scanner.scanDirectories(inputDirectories);
 
-        System.out.printf("Generated %d relationship row(s).%n", rows.size());
+        System.out.printf("Found %d SQL file(s).%n", discoveredFiles.size());
+        for (Path sqlFile : discoveredFiles) {
+            System.out.println(" - " + sqlFile);
+        }
+
+        List<SqlSourceFile> loadedFiles = scanner.loadFiles(inputDirectories);
+        System.out.printf("Loaded %d SQL source file(s) into memory.%n", loadedFiles.size());
+        System.out.println("Extraction and TSV writing are not implemented in Phase 1.");
     }
 }
