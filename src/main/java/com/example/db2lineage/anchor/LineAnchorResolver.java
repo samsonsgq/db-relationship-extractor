@@ -20,7 +20,14 @@ public final class LineAnchorResolver {
         for (int i = 0; i < sourceFile.rawLines().size(); i++) {
             if (sourceFile.rawLines().get(i).contains(statementText.trim())) {
                 int lineNo = i + 1;
-                return Optional.of(new StatementRegion(lineNo, lineNo, sourceFile.lineAt(lineNo)));
+                return Optional.of(new StatementRegion(
+                        "",
+                        "",
+                        lineNo,
+                        lineNo,
+                        sourceFile.lineAt(lineNo),
+                        null
+                ));
             }
         }
         return Optional.empty();
